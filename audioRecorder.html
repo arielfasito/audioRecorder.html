@@ -31,10 +31,14 @@
         const audioUrl = URL.createObjectURL(audioBlob);
         document.getElementById("audioPlayer").src = audioUrl;
 
-        // Enviar el audioBlob al sitio de Wix
-        window.parent.postMessage({ audioUrl: audioUrl }, "*");
+        // Guardar la URL del audio en el almacenamiento local del navegador
+        localStorage.setItem('audioUrl', audioUrl);
+
+        // Enviar la URL del audio al sitio de Wix
+        window.opener.postMessage({ audioUrl: audioUrl }, "*");
       });
     });
   </script>
 </body>
 </html>
+
