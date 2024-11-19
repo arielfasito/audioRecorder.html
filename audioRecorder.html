@@ -31,11 +31,8 @@
         const audioUrl = URL.createObjectURL(audioBlob);
         document.getElementById("audioPlayer").src = audioUrl;
 
-        // Guardar la URL del audio en el almacenamiento local del navegador
-        localStorage.setItem('audioUrl', audioUrl);
-
-        // Enviar la URL del audio al sitio de Wix
-        window.opener.postMessage({ audioUrl: audioUrl }, "*");
+        // Enviar la URL del audio al iframe
+        window.parent.postMessage(audioUrl, "*");
       });
     });
   </script>
