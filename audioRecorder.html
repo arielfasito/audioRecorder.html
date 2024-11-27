@@ -3,39 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audio Recorder</title>
-  <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
-  <meta http-equiv="Permissions-Policy" content="microphone=(self)">
+  <title>Tomar Foto</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    #video { width: 80%; height: auto; }
+    #canvas { display: none; }
+    #photo { width: 80%; height: auto; margin-top: 20px; }
+  </style>
 </head>
 <body>
-  <button id="startButton">Start Recording</button>
-  <button id="stopButton">Stop Recording</button>
-  <audio id="audioPlayer" controls></audio>
+  <h1>Tomar Foto</h1>
+  <video id="video" autoplay playsinline></video>
+  <button id="snapButton">Tomar Foto</button>
+  <canvas id="canvas"></canvas>
+  <img id="photo" alt="Tu foto aparecerá aquí">
+  <button id="downloadButton" style="display: none;">Descargar Foto</button>
 
   <script>
-    let recorder;
-    let audioBlob;
+    // Acceder a la cámara del dispositivo
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photo = document.getElementById('photo');
+    const snapButton = document.getElementById('snapButton');
+    const downloadButton = document.getElementById('downloadButton');
 
-    document.getElementById("startButton").addEventListener("click", () => {
-      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        recorder = RecordRTC(stream, { type: 'audio' });
-        recorder.startRecording();
-      }).catch(error => {
-        console.error("Error al acceder al micrófono:", error);
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(error => {
+        console.error('Error al acceder a la cámara:', error);
       });
-    });
 
-    document.getElementById("stopButton").addEventListener("click", () => {
-      recorder.stopRecording(() => {
-        audioBlob = recorder.getBlob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        document.getElementById("audioPlayer").src = audioUrl;
-
-        // Enviar la URL del audio al iframe
-        window.parent.postMessage(audioUrl, "*");
-      });
+    // Tomar una foto
+    snapButton.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+      photo.src = dataUrl;
+      downloadButton.style.display = 'block';
+      downloadButton.href = dataUrl;
+      downloadButton.download = 'foto.png';
     });
   </script>
 </body>
 </html>
-
